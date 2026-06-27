@@ -18,8 +18,14 @@ Free, no auth required. DefiLlama is the de facto standard for on-chain TVL trac
 .
 ├── fetch_defillama.py        # Hits the API and writes raw output to CSV
 ├── run_analysis.py           # Loads query.sql and runs it against the CSV via DuckDB
+├── visualize.py              # Queries DuckDB and generates visual charts
 ├── query.sql                 # Core data cleaning + analytics query
-└── defillama_protocols.csv   # Raw dataset (auto-generated, not committed)
+├── category_tvl.png          # Generated data visualization chart
+├── queries/                  # Subfolder containing specialized SQL queries
+│   ├── 01_clean_top_protocols.sql
+│   ├── 02_chain_dominance.sql
+│   └── 03_market_concentration_hhi.sql
+└── defillama_protocols.csv   # Raw dataset (auto-generated)
 ```
  
 ---
@@ -28,25 +34,16 @@ Free, no auth required. DefiLlama is the de facto standard for on-chain TVL trac
  
 Raw API responses need work before they're usable. `query.sql` handles this inside a CTE before any analysis runs:
  
-| Issue | Fix |
-|---|---|
-| Extra whitespace in string fields | `TRIM()` on `name`, `symbol`, `category` |
-| Inconsistent symbol casing | `UPPER(TRIM(symbol))` |
-| Missing/empty symbols (`''`, `'-'`, `NULL`) | Replaced with `'N/A'` via `CASE WHEN` |
-| Missing category | Defaulted to `'Other'` via `COALESCE()` |
-| NULL percentage change fields | Defaulted to `0.0` via `COALESCE()` |
-| CEX entries (exchange reserves) | Excluded — `WHERE category != 'CEX'` |
-| Inactive or invalid protocols | Excluded — `WHERE tvl > 0` |
- 
-CEX reserves are excluded by design: exchange-held assets aren't deployed in DeFi and would distort TVL rankings.
+*   **String Normalization**: Trims whitespace from `name`, `symbol`, and `category`.
+*   **Standardization**: Forces symbols to uppercase.
+*   **Missing Values (NULLs)**: Replaces empty/null symbols with `'N/A'`, empty categories with `'Other'`, and null price change rates with `0.0`.
+*   **Filtering**: Excludes Centralized Exchanges (`category != 'CEX'`) and filters out inactive protocols (`tvl > 0`) to focus strictly on active, decentralized protocols.
  
 ---
  
-## Findings
+## SQL Analytics & Findings
  
-Results below are from a recent snapshot against the live dataset.
- 
-### Top 5 Protocols by TVL
+### Top 5 DeFi Protocols by TVL
  
 | # | Protocol | Category | Symbol | TVL |
 |---|---|---|---|---|
@@ -76,15 +73,33 @@ Results below are from a recent snapshot against the live dataset.
 | Dolomite | Lending | +23.88% | $192.23M |
 | Polygon Bridge | Chain Bridge | +22.18% | $2.74B |
  
+### Multi-Chain vs Single-Chain Dominance
+ 
+| Protocol Type | Protocol Count | Total TVL | TVL Share (%) |
+|---|---|---|---|
+| Multi-Chain Protocol | 1,538 | $134.26B | 59.19% |
+| Single-Chain Protocol | 4,030 | $92.58B | 40.81% |
+ 
+### Market Concentration (Herfindahl-Hirschman Index - HHI)
+ 
+*   **HHI Score**: **179.48**
+*   **Interpretation**: Highly competitive / decentralized. (An HHI score below 1,500 indicates a highly diversified and competitive market, proving that capital in DeFi is distributed across thousands of protocols rather than monopolized by a few giants).
+ 
 ---
  
-## Key Takeaways
+## Key Takeaways & Conclusions
  
-**Bridges and Liquid Staking are the backbone of multi-chain DeFi.** Bridges lead at $44.19B, followed by Liquid Staking at $30.41B. Lido's position ($14.37B) reflects how dominant ETH staking yield has become as a baseline rate across the ecosystem.
+> [!IMPORTANT]
+> **1. Multi-Chain is the Standard for Scaling Liquidity**
+> Multi-chain protocols secure 59.19% of all DeFi TVL ($134.26B) despite representing only 27.6% of total protocols. This proves that protocols must deploy across multiple networks to tap into diverse liquidity pools and scale effectively.
  
-**RWA is no longer a niche.** At $25.48B, tokenized real-world assets have moved into fourth place by category. Demand for stable, off-chain yield (primarily US T-bills) is clearly finding its way on-chain at scale.
+> [!NOTE]
+> **2. DeFi remains Highly Anti-Monopolistic**
+> The HHI Score of 179.48 is extremely low. Even though giants like Lido ($14.37B) and Aave V3 ($11.89B) lead the charts, the overall market is highly decentralized. This indicates a healthy, competitive ecosystem where new protocols can easily capture market share.
  
-**Capital allocators are gaining traction.** Mellow Core's +32% weekly growth suggests that depositors are moving toward automated, restaking-layer yield optimization rather than managing positions manually.
+> [!TIP]
+> **3. Core Infrastructure & Real-World Assets Drive TVL**
+> Bridges ($44.19B TVL) and Liquid Staking ($30.41B TVL) remain the baseline liquidity layer. Meanwhile, the climb of Real-World Assets (RWA) to $25.48B TVL indicates a major macroeconomic integration, bringing low-risk off-chain yield (like US Treasury Bills) on-chain.
  
 ---
  
@@ -92,13 +107,16 @@ Results below are from a recent snapshot against the live dataset.
  
 ```bash
 # Install dependencies
-pip install requests duckdb
+pip install requests duckdb matplotlib
  
 # Pull the latest data
 python fetch_defillama.py
  
 # Run the SQL analysis
 python run_analysis.py
+ 
+# Generate data visualization chart
+python visualize.py
 ```
  
-The CSV is regenerated fresh on each run, so results will reflect current on-chain state.
+The CSV is regenerated fresh on each run, so results will reflect the current live on-chain state.
