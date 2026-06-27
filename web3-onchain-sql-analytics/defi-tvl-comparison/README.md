@@ -66,6 +66,8 @@ Results below are from a recent snapshot against the live dataset.
 | RWA | $25.48B | Tokenized treasuries and real-world credit |
 | DEX | $11.29B | On-chain exchange liquidity pools |
  
+![Top DeFi Categories by TVL](category_tvl.png)
+ 
 ### Fastest Growing (TVL > $100M, 7-day window)
  
 | Protocol | Category | 7d Change | TVL |
