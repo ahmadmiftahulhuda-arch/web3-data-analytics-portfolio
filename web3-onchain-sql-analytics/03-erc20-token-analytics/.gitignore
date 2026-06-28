@@ -1,0 +1,19 @@
+# Output data — jangan commit ke GitHub
+output/*.csv
+output/*.parquet
+output/*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Google Cloud credentials — JANGAN PERNAH COMMIT!
+*.json
+service-account-key*
+credentials*
+
+# OS
+.DS_Store
+Thumbs.db

@@ -69,8 +69,10 @@ A compilation of local on-chain case studies using SQL (DuckDB/PostgreSQL) and P
     *   *Analysis*: TVL comparison of 7,700+ DeFi protocols via the DefiLlama API, category market share, Herfindahl-Hirschman Index (HHI) concentration score, and Multi-Chain dominance metrics. Features visual category plotting.
 *   **[02-ethereum-gas-analysis](./web3-onchain-sql-analytics/02-ethereum-gas-analysis)** ✅ **Done**
     *   *Analysis*: Daily/weekly Ethereum gas fee pattern (UTC & WIB), cheapest transaction window optimization, and pre vs. post EIP-1559 volatility comparison using standard deviation. Features volatility boxplots.
-*   **03-dex-liquidity-analysis** 🔄 *Upcoming* (Uniswap v3 fee tier & volume distribution)
-*   **04-nft-wash-trade-detection** 🔄 *Upcoming* (Direct self-trades & back-and-forth trade detection)
+*   **[03-erc20-token-analytics](./web3-onchain-sql-analytics/03-erc20-token-analytics)** ✅ **Done**
+    *   *Analysis*: On-chain ERC-20 token transfer patterns, top holders distribution, transfer velocity tracking, and circular transfer/wash trading detection using Google BigQuery and local DuckDB. Features holder distribution bar charts and daily volume lines.
+*   **[04-stablecoin-supply-analysis](./web3-onchain-sql-analytics/04-stablecoin-supply-analysis)** ✅ **Done**
+    *   *Analysis*: Stablecoin supply dynamics, cross-chain distribution profiles, price depeg alerts, and redemption stress events using the DefiLlama API and DuckDB. Features supply share donut charts and 30-day growth bar charts.
 *   **05-wallet-cohort-analysis** 🔄 *Upcoming* (New wallets cohort retention analysis at 30/60/90 days)
 *   **06-stablecoin-flow-tracker** 🔄 *Upcoming* (Stablecoin exchange inflow/outflow tracker)
 
